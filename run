@@ -1,2 +1,5 @@
+#!/bin/sh
+
 npm install
-npm run start
+
+HONEYCOMB_DATASET=cheese-svc node ./src/index.js

@@ -27,7 +27,7 @@ opentelemetry.diag.setLogger(new opentelemetry.DiagConsoleLogger(), opentelemetr
 
   const provider = new NodeTracerProvider({
     resource: new Resource({
-      [SemanticResourceAttributes.SERVICE_NAME]: process.env.SERVICE_NAME || 'fibonacci-microservice',
+      [SemanticResourceAttributes.SERVICE_NAME]: process.env.SERVICE_NAME || 'fib-microsvc',
     }),
   });
 
@@ -41,7 +41,7 @@ opentelemetry.diag.setLogger(new opentelemetry.DiagConsoleLogger(), opentelemetr
   provider.addSpanProcessor(
     new BatchSpanProcessor(
       new OTLPTraceExporter({
-        url: "grpc://api.honeycomb.io:443/",
+        url: "grpc://api-dogfood.honeycomb.io:443/v2",
         credentials: creds,
         metadata
       }), { scheduledDelayMillis: 500, maxQueueSize: 16000, maxExportBatchSize: 1000 }
