@@ -33,7 +33,7 @@ opentelemetry.diag.setLogger(new opentelemetry.DiagConsoleLogger(), opentelemetr
 
   const metadata = new grpc.Metadata();
   const apikey = process.env.HONEYCOMB_API_KEY;
-  const dataset = process.env.HONEYCOMB_DATASET || "otel-nodejs";
+  const dataset = process.env.SERVICE_NAME || "otel-nodejs"; // service name determines dataset (will be automatic later)
   console.log(`Exporting to Honeycomb with APIKEY <${apikey}> and dataset ${dataset}`)
   metadata.set("x-honeycomb-team", apikey);
   metadata.set("x-honeycomb-dataset", dataset);

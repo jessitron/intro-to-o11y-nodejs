@@ -1,5 +1,5 @@
 #!/bin/sh
 
-npm install
+# npm install
 
-HONEYCOMB_DATASET=cheese-svc node ./src/index.js
+SERVICE_NAME=cheese-svc node ./src/index.js
