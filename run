@@ -2,4 +2,6 @@
 
 # npm install
 
-SERVICE_NAME=cheese-svc node ./src/index.js
+SERVICE_NAME=cheese-svc node ./src/index.js &
+SERVICE_NAME=milk-prep PORT=3001 node ./src/index.js &
+SERVICE_NAME=curdling PORT=3002 node ./src/index.js
