@@ -6,6 +6,7 @@ const http = require("http");
 const opentelemetry = require("@opentelemetry/api");
 const path = require("path");
 const app = express();
+const { slowThing } = require("./linked");
 
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "/../static/views/index.html"));
@@ -19,6 +20,16 @@ app.get("/styles.css", (req, res) => {
 app.get("/sequence.js", (req, res) => {
   res.sendFile(path.join(__dirname, "/../static/views/sequence.js"));
 });
+
+app.get("/link", async (req, res) => {
+  let thingName = req.query.name || "something";
+  
+  const span = opentelemetry.trace.getSpan(opentelemetry.context.active());
+  span.setAttribute("app.thingToTrigger", thingName);
+
+  setTimeout(() => slowThing(span.spanContext()), 5000);
+  res.send("OK");
+})
 
 app.get("/fib", async (req, res) => {
   let index = parseInt(req.query.index);
