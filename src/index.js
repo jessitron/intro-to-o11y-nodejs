@@ -27,7 +27,7 @@ app.get("/link", async (req, res) => {
   const span = opentelemetry.trace.getSpan(opentelemetry.context.active());
   span.setAttribute("app.thingToTrigger", thingName);
 
-  setTimeout(() => slowThing(span.spanContext()), 5000);
+  setTimeout(() => slowThing(span.spanContext(), thingName), 5000);
   res.send("OK");
 })
 
