@@ -5,8 +5,8 @@ const express = require("express");
 const http = require("http");
 const opentelemetry = require("@opentelemetry/api");
 const path = require("path");
-const app = express();
 const { slowThing } = require("./linked");
+const app = express();
 
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "/../static/views/index.html"));
