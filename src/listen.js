@@ -4,8 +4,9 @@ const app = express();
 
 app.use(express.json());
 
-app.post("/", (req, res) => {
-  console.log(req.body);
+app.post("*", (req, res) => {
+  console.log("received at " + req.url);
+  console.log(JSON.stringify(req.body, null, 2));
   res.send("thanks\n")
 }
 );

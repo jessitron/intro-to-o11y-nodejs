@@ -16,6 +16,8 @@ const {
   ExpressInstrumentation
 } = require("@opentelemetry/instrumentation-express");
 const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-grpc');
+
+const jsonExporter = require('@opentelemetry/exporter-trace-otlp-http');
 const { registerInstrumentations } = require("@opentelemetry/instrumentation");
 const grpc = require("@grpc/grpc-js");
 const { Resource } = require('@opentelemetry/resources');
@@ -23,7 +25,7 @@ const { SemanticResourceAttributes } = require('@opentelemetry/semantic-conventi
 
 module.exports = () => {
   // set log level to DEBUG for a lot of output
-opentelemetry.diag.setLogger(new opentelemetry.DiagConsoleLogger(), opentelemetry.DiagLogLevel.DEBUG);
+opentelemetry.diag.setLogger(new opentelemetry.DiagConsoleLogger(), opentelemetry.DiagLogLevel.INFO);
 
   const provider = new NodeTracerProvider({
     resource: new Resource({
@@ -50,6 +52,9 @@ opentelemetry.diag.setLogger(new opentelemetry.DiagConsoleLogger(), opentelemetr
 
   // uncomment this to see traces in stdout
   //provider.addSpanProcessor(new BatchSpanProcessor(new ConsoleSpanExporter()));
+  const exportToJson = new jsonExporter.OTLPTraceExporter({url: "http://localhost:3001"})
+  provider.addSpanProcessor(new BatchSpanProcessor(exportToJson,
+    { scheduledDelayMillis: 500, maxQueueSize: 100, maxExportBatchSize: 10 }));
 
   provider.register();
 
