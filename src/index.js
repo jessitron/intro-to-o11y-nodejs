@@ -1,9 +1,10 @@
 require("dotenv").config();
-const tracer = require("./tracing")(); // turn on tracing
+require("./tracing")(); // turn on tracing
 
 const express = require("express");
 const http = require("http");
 const opentelemetry = require("@opentelemetry/api");
+const BabyCache = require("./cache");
 const path = require("path");
 const app = express();
 
@@ -32,15 +33,10 @@ app.get("/fib", async (req, res) => {
   } else if (index === 1) {
     returnValue = 1;
   } else {
-    let minusOneResponse = await makeRequest(
-      `http://127.0.0.1:3000/fib?index=${index - 1}`
-    );
-    let minusOneParsedResponse = JSON.parse(minusOneResponse);
-    let minusTwoReturn = JSON.parse(await makeRequest(
-      `http://127.0.0.1:3000/fib?index=${index - 2}`
-    ));
-    returnValue = calculateFibonacciNumber(minusOneParsedResponse.fibonacciNumber,
-      minusTwoReturn.fibonacciNumber);
+    let minusOneResponse = await retrieveFibonacciResponse(index - 1, fetchFibonacciResponse);
+    let minusTwoResponse = await retrieveFibonacciResponse(index - 2, fetchFibonacciResponse);
+    returnValue = calculateFibonacciNumber(minusOneResponse.fibonacciNumber,
+      minusTwoResponse.fibonacciNumber);
   }
 
   span.setAttribute("app.seqofnum.result.fibonacciNumber", returnValue);
@@ -48,10 +44,45 @@ app.get("/fib", async (req, res) => {
   res.send(JSON.stringify(returnObject));
 });
 
+const fibonacciCache = new BabyCache();
+const tracer = opentelemetry.trace.getTracer("fibonacci-cache");
+
+/**
+ * 
+ * @param {number} index 
+ * @param {number => Promise<Object>} onMiss 
+ * @returns 
+ */
+async function retrieveFibonacciResponse(index, onMiss) {
+  const span = tracer.startSpan("check cache");
+  span.setAttribute("app.seqofnum.cache.size", fibonacciCache.size());
+  if (fibonacciCache.has(index)) {
+    span.setAttribute("app.seqofnum.cache.hit", true);
+    const result = fibonacciCache.get(index);
+    span.end();
+    return result;
+  } else {
+    span.setAttribute("app.seqofnum.cache.hit", false);
+    const fetchedResult = await onMiss(index);
+    span.setAttribute("app.seqofnum.cache.addKey", index);
+    fibonacciCache.set(index, fetchedResult);
+    span.end();
+    return fetchedResult;
+  }
+}
+
+async function fetchFibonacciResponse(index) {
+  const fetchedResult = await makeRequest(
+    `http://127.0.0.1:3000/fib?index=${index}`
+  );
+  const result = JSON.parse(fetchedResult);
+  return result;
+}
+
 function calculateFibonacciNumber(previous, oneBeforeThat) {
   // can you wrap this next line in a custom span?
   const result = previous + oneBeforeThat;
-  return previous + oneBeforeThat;
+  return result;
 }
 
 function makeRequest(url) {
