@@ -45,7 +45,7 @@ app.get("/fib", async (req, res) => {
 });
 
 const fibonacciCache = new BabyCache();
-const tracer = opentelemetry.trace.getTracer("fibonacci-cache");
+const tracer = opentelemetry.trace.getTracer("seqofnum");
 
 /**
  * 
@@ -54,21 +54,20 @@ const tracer = opentelemetry.trace.getTracer("fibonacci-cache");
  * @returns 
  */
 async function retrieveFibonacciResponse(index, onMiss) {
-  return tracer.startActiveSpan("retrieve fibonacci number", async span => {
-    span.setAttribute("app.seqofnum.parameter.index", index);
-    if (fibonacciCache.has(index)) {
-      span.setAttribute("app.seqofnum.cache.hit", true);
-      const result = fibonacciCache.get(index);
-      span.end()
-      return result;
-    } else {
-      span.setAttribute("app.seqofnum.cache.hit", false);
-      const fetchedResult = await onMiss(index);
-      fibonacciCache.set(index, fetchedResult);
-      span.end();
-      return fetchedResult;
-    }
-  });
+  const span = tracer.startSpan("retrieve fibonacci number");
+  span.setAttribute("app.seqofnum.parameter.index", index);
+  if (fibonacciCache.has(index)) {
+    span.setAttribute("app.seqofnum.cache.hit", true);
+    const result = fibonacciCache.get(index);
+    span.end()
+    return result;
+  } else {
+    span.setAttribute("app.seqofnum.cache.hit", false);
+    const fetchedResult = await onMiss(index);
+    fibonacciCache.set(index, fetchedResult);
+    span.end();
+    return fetchedResult;
+  }
 }
 
 app.post("/clearCache", (req, res) => {
