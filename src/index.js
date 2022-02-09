@@ -71,6 +71,11 @@ async function retrieveFibonacciResponse(index, onMiss) {
   });
 }
 
+app.post("/clearCache", (req, res) => {
+  fibonacciCache.clear();
+  res.send("OK");
+})
+
 async function fetchFibonacciResponse(index) {
   const fetchedResult = await makeRequest(
     `http://127.0.0.1:3000/fib?index=${index}`

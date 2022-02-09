@@ -36,9 +36,9 @@ class BabyCache {
   }
   clear() {
     const span = tracer.startSpan("clear cache");
-    span.setAttribute("app.seqofnum.cache.previous_size", fibonacciCache.size());
+    span.setAttribute("app.seqofnum.cache.previous_size", this.size());
     this.cache = [];
-    span.setAttribute("app.seqofnum.cache.size", fibonacciCache.size());
+    span.setAttribute("app.seqofnum.cache.size", this.size());
     span.end();
   }
 };
