@@ -57,10 +57,12 @@ async function retrieveFibonacciResponse(index, onMiss) {
   return tracer.startActiveSpan("retrieve fibonacci number", async span => {
     span.setAttribute("app.seqofnum.parameter.index", index);
     if (fibonacciCache.has(index)) {
+      span.setAttribute("app.seqofnum.cache.hit", true);
       const result = fibonacciCache.get(index);
       span.end()
       return result;
     } else {
+      span.setAttribute("app.seqofnum.cache.hit", false);
       const fetchedResult = await onMiss(index);
       fibonacciCache.set(index, fetchedResult);
       span.end();
