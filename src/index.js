@@ -54,19 +54,11 @@ const tracer = opentelemetry.trace.getTracer("fibonacci-cache");
  * @returns 
  */
 async function retrieveFibonacciResponse(index, onMiss) {
-  const span = tracer.startSpan("check cache");
-  span.setAttribute("app.seqofnum.cache.size", fibonacciCache.size());
   if (fibonacciCache.has(index)) {
-    span.setAttribute("app.seqofnum.cache.hit", true);
-    const result = fibonacciCache.get(index);
-    span.end();
-    return result;
+    return fibonacciCache.get(index);
   } else {
-    span.setAttribute("app.seqofnum.cache.hit", false);
     const fetchedResult = await onMiss(index);
-    span.setAttribute("app.seqofnum.cache.addKey", index);
     fibonacciCache.set(index, fetchedResult);
-    span.end();
     return fetchedResult;
   }
 }
