@@ -10,14 +10,14 @@ class BabyCache {
   get(key) {
     const span = tracer.startSpan("fetch from cache");
     span.setAttribute("app.seqofnum.cache.size", this.size());
-    span.setAttribute("app.seqofnum.cache.key", key)
+    span.setAttribute("app.seqofnum.cache.key", key);
     const result = this.cache[key];
     span.end();
     return result;
   }
   set(key, value) {
     const span = tracer.startSpan("insert into cache");
-    span.setAttribute("app.seqofnum.cache.key", key)
+    span.setAttribute("app.seqofnum.cache.key", key);
     this.cache[key] = value;
     span.setAttribute("app.seqofnum.cache.size", this.size());
     span.end();
@@ -25,7 +25,7 @@ class BabyCache {
   has(key) {
     const span = tracer.startSpan("check cache");
     span.setAttribute("app.seqofnum.cache.size", this.size());
-    span.setAttribute("app.seqofnum.cache.key", key)
+    span.setAttribute("app.seqofnum.cache.key", key);
     const result = this.cache[key] !== undefined
     span.setAttribute("app.seqofnum.cache.hit", result);
     span.end();
