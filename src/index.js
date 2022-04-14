@@ -7,6 +7,16 @@ const otel = require("@opentelemetry/api");
 const path = require("path");
 const app = express();
 
+function log(msg) {
+  console.log(`${Date.now()} ${msg}`);
+}
+
+// log each incoming request.
+app.use((req, res, next) => {
+  log(`${req.method} ${req.url}`);
+  next();
+})
+
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "/../static/views/index.html"));
 });
@@ -21,6 +31,7 @@ app.get("/sequence.js", (req, res) => {
 });
 
 app.get("/fib", async (req, res) => {
+  log("Handling /fib");
   const index = parseInt(req.query.index);
 
   // uncomment 2 lines to add a custom attribute:
@@ -58,6 +69,7 @@ function calculateFibonacciNumber(previous, oneBeforeThat) {
 function makeRequest(url) {
   return new Promise((resolve, reject) => {
     let data = "";
+    log(`HTTP GET: url=${url}`)
     http.get(url, res => {
       res.on("data", chunk => {
         data += chunk;
