@@ -44,15 +44,17 @@ app.get("/fib", async (req, res) => {
   } else if (index === 1) {
     returnValue = 1;
   } else {
-    let minusOneResponse = await makeRequest(
+    let minusOnePromise = makeRequest(
       `http://127.0.0.1:3000/fib?index=${index - 1}`
     );
-    let minusOneParsedResponse = JSON.parse(minusOneResponse);
-    let minusTwoReturn = JSON.parse(await makeRequest(
+    let minusTwoPromise = makeRequest(
       `http://127.0.0.1:3000/fib?index=${index - 2}`
-    ));
+    );
+    const [minusOneResponse, minusTwoResponse] = await Promise.all([minusOnePromise, minusTwoPromise]);
+    let minusOneParsedResponse = JSON.parse(minusOneResponse);
+    let minusTwoParsedResponse = JSON.parse(minusTwoResponse);
     returnValue = calculateFibonacciNumber(minusOneParsedResponse.fibonacciNumber,
-      minusTwoReturn.fibonacciNumber);
+      minusTwoParsedResponse.fibonacciNumber);
   }
 
   // span.setAttribute("app.seqofnum.result.fibonacciNumber", returnValue);
