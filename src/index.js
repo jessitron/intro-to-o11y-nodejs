@@ -7,13 +7,21 @@ const otel = require("@opentelemetry/api");
 const path = require("path");
 const app = express();
 
-function log(msg) {
-  console.log(`${Date.now()} ${msg}`);
+function log(msg, req) {
+  var internalReqId = "0 ";
+  if (req) {
+    if (!req.internalLogId) {
+      req.internalLogId = internalLogIdSequence++;
+    }
+    internalReqId = req.internalLogId;
+  }
+  console.log(`${Date.now()} ${internalReqId} ${msg}`);
 }
 
+var internalLogIdSequence = 1;
 // log each incoming request.
 app.use((req, res, next) => {
-  log(`${req.method} ${req.url}`);
+  log(`${req.method} ${req.url}`, req);
   next();
 })
 
@@ -31,47 +39,55 @@ app.get("/sequence.js", (req, res) => {
 });
 
 app.get("/fib", async (req, res) => {
-  log("Handling /fib");
+  log("Handling /fib", req);
   const index = parseInt(req.query.index);
 
   // uncomment 2 lines to add a custom attribute:
-  // const span = otel.trace.getSpan(otel.context.active());
-  // span.setAttribute("parameter.index", index);
+  const span = otel.trace.getSpan(otel.context.active());
+  span?.setAttribute("parameter.index", index);
+  log(`index=${index}`, req);
 
   let returnValue = 0;
   if (index === 0) {
+    log("JESS WAS HERE", req)
+    otel.trace.getTracer("jess").startSpan("JESS WAS HERE").end();
     returnValue = 0;
   } else if (index === 1) {
     returnValue = 1;
   } else {
     let minusOnePromise = makeRequest(
-      `http://127.0.0.1:3000/fib?index=${index - 1}`
+      `http://127.0.0.1:3000/fib?index=${index - 1}`, req
     );
     let minusTwoPromise = makeRequest(
-      `http://127.0.0.1:3000/fib?index=${index - 2}`
+      `http://127.0.0.1:3000/fib?index=${index - 2}`, req
     );
     const [minusOneResponse, minusTwoResponse] = await Promise.all([minusOnePromise, minusTwoPromise]);
     let minusOneParsedResponse = JSON.parse(minusOneResponse);
     let minusTwoParsedResponse = JSON.parse(minusTwoResponse);
     returnValue = calculateFibonacciNumber(minusOneParsedResponse.fibonacciNumber,
-      minusTwoParsedResponse.fibonacciNumber);
+      minusTwoParsedResponse.fibonacciNumber, req);
   }
 
-  // span.setAttribute("app.seqofnum.result.fibonacciNumber", returnValue);
-  const returnObject = { fibonacciNumber: returnValue, index: index }
+  const returnObject = { fibonacciNumber: returnValue, index: index };
+  log(`Finished /fib result=${returnValue}`, req);
   res.send(JSON.stringify(returnObject));
 });
 
-function calculateFibonacciNumber(previous, oneBeforeThat) {
+function calculateFibonacciNumber(previous, oneBeforeThat, req) {
   // can you wrap this next line in a custom span?
+  const span = otel.trace.getTracer("app.seqofnum").startSpan("calculate");
+  log(`start calculating`, req);
   const result = previous + oneBeforeThat;
-  return previous + oneBeforeThat;
+  span.setAttribute("app.result", result);
+  span.end();
+  log(`finish calculating. result=${result}`, req);
+  return result;
 }
 
-function makeRequest(url) {
+function makeRequest(url, req) {
   return new Promise((resolve, reject) => {
     let data = "";
-    log(`HTTP GET: url=${url}`)
+    log(`HTTP GET: url=${url}`, req)
     http.get(url, res => {
       res.on("data", chunk => {
         data += chunk;
