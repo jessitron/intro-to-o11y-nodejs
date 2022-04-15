@@ -1,0 +1,39 @@
+audited 139 packages in 1.058s
+
+6 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+
+
+> fibonacci-microservice@0.0.1 start /workspaces/intro-to-o11y-nodejs
+> node ./src/index.js
+
+Exporting to Honeycomb with APIKEY <25GMuCioXfTyhGucU5dkZF> and service name sequence-of-numbers
+Listening on port 3000. Try: http://localhost:3000/
+1649986663013 1 GET /fib?index=0
+1649986663014 1 Handling /fib
+1649986663014 1 index=0
+1649986663015 1 JESS WAS HERE
+1649986663015 1 Finished /fib result=0
+1649986663227 2 GET /fib?index=1
+1649986663227 2 Handling /fib
+1649986663227 2 index=1
+1649986663227 2 Finished /fib result=1
+1649986663435 3 GET /fib?index=2
+1649986663435 3 Handling /fib
+1649986663435 3 index=2
+1649986663436 3 HTTP GET: url=http://127.0.0.1:3000/fib?index=1
+1649986663440 3 HTTP GET: url=http://127.0.0.1:3000/fib?index=0
+1649986663449 4 GET /fib?index=1
+1649986663450 4 Handling /fib
+1649986663450 4 index=1
+1649986663450 4 Finished /fib result=1
+1649986663452 5 GET /fib?index=0
+1649986663452 5 Handling /fib
+1649986663452 5 index=0
+1649986663452 5 JESS WAS HERE
+1649986663452 5 Finished /fib result=0
+1649986663459 3 start calculating
+1649986663460 3 finish calculating. result=1
+1649986663460 3 Finished /fib result=1

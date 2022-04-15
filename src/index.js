@@ -19,11 +19,12 @@ function log(msg, req) {
 }
 
 var internalLogIdSequence = 1;
-// log each incoming request.
-app.use((req, res, next) => {
+function logEachRequest(req, res, next) {
   log(`${req.method} ${req.url}`, req);
   next();
-})
+};
+// log each incoming request.
+app.use(logEachRequest);
 
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "/../static/views/index.html"));
