@@ -1,5 +1,3 @@
-require("dotenv").config();
-const tracer = require("./tracing")(); // turn on tracing
 
 const express = require("express");
 const http = require("http");
@@ -24,8 +22,8 @@ app.get("/fib", async (req, res) => {
   const index = parseInt(req.query.index);
 
   // uncomment 2 lines to add a custom attribute:
-  // const span = otel.trace.getSpan(otel.context.active());
-  // span.setAttribute("parameter.index", index);
+  const span = otel.trace.getSpan(otel.context.active());
+  span.setAttribute("parameter.index", index);
 
   let returnValue = 0;
   if (index === 0) {
@@ -75,3 +73,14 @@ function makeRequest(url) {
 app.listen(process.env.PORT || 3000, () =>
   console.log("Listening on port 3000. Try: http://localhost:3000/")
 );
+
+
+var B = function(a, b, c) {
+  a = a.split("&");
+  for(var d = 0; d < a.length; d++){
+    var e = a[d].split("=");
+    if(decodeURIComponent(e[0]).replace(/\+/g," ") === b)
+      return b = e.slice(1).join("="), c ? b : decodeURIComponent(b).replace(/\+/g," ")
+  }
+}
+
