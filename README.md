@@ -1,23 +1,24 @@
 # Intro to Observability: Demo in Node.js
 
+#### vendor-neutral (ish) version
+
 This Node.js application is here for you to try out tracing.
 It consists of a microservice that calls itself,
 so you can simulate a whole microservice ecosystem with just one service!
-
-Spoiler: this microservice implements the <a href="https://en.wikipedia.org/wiki/Fibonacci_number">Fibonacci sequence</a>.
 
 ## What to do
 
 Recommended: 
 
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/honeycombio/intro-to-o11y-nodejs)
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/jessitron/o11y-xp-nodejs)
 
-Alternative:
-If you like Glitch, you can [remix this app in Glitch](https://glitch.com/edit/#!/intro-to-o11y-nodejs?path=README.md%3A1%3A0).
+Alternative: [Remix on Glitch](https://o11y-xp-nodejs.glitch.me/)
 
-Alternative: You can also [run locally](#running-locally))
+Alternative: You can also [run locally](#running-locally)
 
 ## Start the app
+
+In GitPod, the app will probably run itself when the workspace starts up. In general, open a terminal and run:
 
 `./run`
 
@@ -36,6 +37,22 @@ Let's add tracing and find out!
 
 Push `Ctrl-C` in the terminal where the app is running.
 
+## Connect the tracing to Jaeger
+
+Set an environment variable `JAEGER_LOCATION` to the IP address (or domain name) where a Jaeger instance lives.
+If you're in a workshop, Jess will provide one.
+
+One handy way to set the right environment variables is to copy the example environment:
+
+`cp .env.example .env`
+
+Now edit the contents of `.env` to put in your API key. This file is ignored by git, so you
+won't accidentally commit your API key.
+
+The properties in `.env` are read in when the program starts up.
+
+Consider changing the OTEL_SERVICE_NAME variable to something unique, like your favorite animal.
+
 ## Configure tracing to connect to Honeycomb
 
 This project has the tracing configuration set up in tracing.js.
@@ -43,7 +60,9 @@ See that the top line of `index.js` calls into `tracing.js` to activate this.
 
 In `tracing.js`, the code refers to some environment variables.
 
-[Log in to honeycomb](ui.honeycomb.io) and [get a Honeycomb API Key](https://docs.honeycomb.io/getting-data-in/api-keys/#find-api-keys).
+If you have a Honeycomb team, [Log in to honeycomb](ui.honeycomb.io) and [get a Honeycomb API Key](https://docs.honeycomb.io/getting-data-in/api-keys/#find-api-keys).
+
+If you're in the workshop, Jess will give you one and invite you to her team.
 
 Recommended: Copy the example environment:
 
@@ -126,6 +145,11 @@ npm run start
 ```
 
 Then hit the application locally: http://localhost:3000
+
+
+
+# Spoiler
+this microservice implements the <a href="https://en.wikipedia.org/wiki/Fibonacci_number">Fibonacci sequence</a>.
 
 # Updating
 
